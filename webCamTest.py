@@ -1,28 +1,16 @@
 import cv2 as cv
-import requests
-import numpy as np
 
-# Inicia la captura desde DroidCam
-capture = cv.VideoCapture(1)  # Índice o URL
+# Iniciar captura desde DroidCam o EpocCam (usualmente índice 1 o una URL)
+capture = cv.VideoCapture(1)  # o usa la URL de la app, como 'http://<IP>:4747/mjpegfeed'
 
 while True:
     isTrue, frame = capture.read()
     if not isTrue:
         break
 
-    # Codifica el frame como imagen JPEG para enviarla al servidor
-    _, img_encoded = cv.imencode('.jpg', frame)
-    response = requests.post(
-        "http://127.0.0.1:8000/segment/",
-        files={"file": img_encoded.tobytes()}
-    )
+    # Aquí podrías pasar el frame a SAM2 después de procesarlo
+    cv.imshow('Live Feed', frame)
 
-    # Procesa la respuesta de segmentación si está disponible
-    if response.status_code == 200:
-        segmentation = np.array(response.json()["segmentation"])
-        cv.imshow('Segmented Feed', segmentation)
-
-    # Cierra con 'q'
     if cv.waitKey(1) & 0xFF == ord('q'):
         break
 
